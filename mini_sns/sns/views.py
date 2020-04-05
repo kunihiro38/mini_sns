@@ -75,7 +75,7 @@ def groups(request):
         # Groupsメニュー選択肢の処理
         if request.POST['mode'] == '__groups_form__':
             #　選択したGroup名を取得
-            self_group = request.POST['groups']
+            sel_group = request.POST['groups']
             # Groupを取得
             gp = Group.objects.filter(owner=request.user) \
                 .filter(title=sel_group).first()
@@ -95,9 +95,9 @@ def groups(request):
         if request.POST['mode'] == '__friends_form__':
             #　選択したGroupの取得
             sel_group = request.POST['group']
-            group_obj = Group.objects.filter(title==sel_group).first()
+            group_obj = Group.objects.filter(title=sel_group).first()
             # チェックしたFriensを取得
-            sel_fds = request.POST.getlist('freiends')
+            sel_fds = request.POST.getlist('friends')
             # FriendsのUserを取得
             sel_users = User.objects.filter(username__in=sel_fds)
             # Userのリストに含まれるユーザーが登録したFriendを取得
@@ -110,8 +110,7 @@ def groups(request):
                 item.save()
                 vlist.append(item.user.username)
             #　メッセージを設定
-            message.success(request, '　チェックされたFriendを' + \
-                sel_group + 'に登録しました')
+            messages.success(request, '　チェックされたFriendを' + sel_group + 'に登録しました')
             # フォームの用意
             groupsform = GroupSelectForm(request.user, \
                     {'groups':sel_group})
@@ -119,21 +118,21 @@ def groups(request):
                     friends=friends, vals=vlist)
     
     # GET アクセス時の処理
-    # else:
-        #フォームの用意
-        # groupsform = GroupSelectForm(request.user)
-        # friendsform = FriendsForm(request.user, friends=friends, \
-        #         vals=[])
-        # sel_group ='-'
+    else:
+        # フォームの用意
+        groupsform = GroupSelectForm(request.user)
+        friendsform = FriendsForm(request.user, friends=friends, \
+                vals=[])
+        sel_group ='-'
     
     # 共通処理
-    # createform = CreateGroupForm()
+    createform = CreateGroupForm()
     params = {
         'login_user':request.user,
-        # 'groups_form':groupsform,
-        # 'friends_form':friendsform,
-        # 'create_form':createform,
-        # 'group':sel_group,
+        'groups_form':groupsform,
+        'friends_form':friendsform,
+        'create_form':createform,
+        'group':sel_group,
     }
 
     return render(request, 'sns/groups.html', params)
@@ -146,7 +145,7 @@ def add(request):
     add_user = User.objects.filter(username=add_name).first()
     # User本人だった場合
     if add_user == request.user:
-        message.info(request, "自分自信をFriendに追加することはできません。")
+        messages.info(request, "自分自信をFriendに追加することはできません。")
         return redirect(to='/sns')
     # publicの取得
     (public_user, public_group) = get_public()
@@ -223,8 +222,7 @@ def share(request, share_id):
         gr_name = request.POST['groups']
         content = request.POST['content']
         # Groupの取得
-        group = Group.objects.filter(owner=request.user) \
-                .filter(title=gr_name).first()
+        group = Group.objects.filter(owner=request.user).filter(title=gr_name).first()
         if group == None:
             (pub_user, group) = get_public()
         # メッセージを作成し、設定をして保存
@@ -232,21 +230,21 @@ def share(request, share_id):
         msg.owner = request.user
         msg.group = group
         msg.content = content
-        msg.share_id = shasre.id
+        msg.share_id = share.id
         msg.save()
         share_msg = msg.get_share()
         share_msg.share_count += 1
         share_msg.save()
         # メッセージを設定
         messages.success(request, 'メッセージをシェアしました!')
-        return redirect(top='/sns')
+        return redirect(to='/sns')
 
     # 共通処理
     form = PostForm(request.user)
     params = {
             'login_user': request.user,
             'form': form,
-            'shasre':share,
+            'share':share,
     }
     return render(request, 'sns/share.html', params)
 
@@ -259,7 +257,7 @@ def good(request, good_id):
     is_good = Good.objects.filter(owner=request.user).filter(message=good_msg).count()
     # ゼロより大きければ既にgood済み
     if is_good > 0:
-        message.success(request, '既にメッセージにはGoodしています。')
+        messages.success(request, '既にメッセージにはGoodしています。')
         return redirect(to='/sns')
     
     # MessageのGood_countを1増やす

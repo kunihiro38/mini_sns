@@ -36,7 +36,7 @@
 <p>※新しいGroupの登録</p>
 <form action="{% url 'creategroup' %}" method="post">
 {% csrf_token %}
-{{ create_form }}
+{{create_form}}
 <button>create new group</button>
 </form>
 {% endblock %}

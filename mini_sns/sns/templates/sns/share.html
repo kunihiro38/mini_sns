@@ -8,14 +8,14 @@
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags}}"
+    <li{% if message.tags %} class="{{ message.tags }}"
         {% endif %}>{{ message }}</li>
-    {% enddor %}
+    {% endfor %}
 </ul>
 {% endif %}
 {% endblock %}
 
-{% endblock %}
+{% block content %}
 <p class="share_content">{{share.content}} ({{share.owner}})</p>
 <form action="{% url 'share' share.id %}" method="post">
 {% csrf_token %}

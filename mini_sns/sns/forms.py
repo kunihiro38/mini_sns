@@ -52,10 +52,10 @@ class GroupCheckForm(forms.Form):
 # formsクラスの中にあるFormというクラス名を継承してサブクラス(GroupSelectForm)を定義する
 class GroupSelectForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
-        super(GroupSelectForm, selff).__init__(*args,  **kwargs)
+        super(GroupSelectForm, self).__init__(*args, **kwargs)
         self.fields['groups'] = forms.ChoiceField(
             choices=[('-', '-')] + [(item.title, item.title) \
-            for item in Group.objectsfilter(owner=user)],
+                for item in Group.objects.filter(owner=user)],
         )
 
 # Friendのチェックボックスフォーム

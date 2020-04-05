@@ -7,6 +7,11 @@ ID:admin
 パスワード:django0328
 """
 
+"""
+ID:gen
+パスワード:april0405
+"""
+
 
 
 admin.site.register(Message)
